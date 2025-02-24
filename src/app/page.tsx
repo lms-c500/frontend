@@ -1,101 +1,152 @@
-import Image from "next/image";
+"use client";
+import { Button } from "@/components/ui/button"; // If using shadcn/ui
+import { FileScannerIcon } from "@/components/vectors/file-scanner";
+import { cn } from "@/lib/utils"; // Ensure you have this helper function
+import { useRef, useState } from "react";
+import { Oswald } from "next/font/google";
 
-export default function Home() {
+const oswald = Oswald();
+
+export default function MalwareScanUI() {
+  const [activeTab, setActiveTab] = useState<"file" | "folder">("file");
+  const [fileStructure, setFileStructure] = useState<Record<string, File>>({});
+
+  const folderInputRef = useRef<HTMLInputElement | null>(null);
+
+  // Handle file/folder selection
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files) {
+      const files = Array.from(event.target.files);
+      const structuredFiles: Record<string, File> = {};
+
+      files.forEach((file) => {
+        if (file.webkitRelativePath) {
+          // Store relative path -> file mapping
+          structuredFiles[file.webkitRelativePath] = file;
+        } else {
+          // Handle single file selection
+          structuredFiles[file.name] = file;
+        }
+      });
+
+      setFileStructure(structuredFiles);
+    }
+  };
+
+  // Handle tab change
+  const handleTabChange = (tab: "file" | "folder") => {
+    setActiveTab(tab);
+    setFileStructure({});
+  };
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+    <div className="flex flex-col items-center bg-gray-900 text-white min-h-screen p-8">
+      <div className="flex flex-col items-center w-[48rem] gap-8">
+        <h1
+          className={`text-4xl font-normal text-blue-400 ${oswald.className}`}
+        >
+          LINUX MALWARE SCAN C500
+        </h1>
+        <p className="text-gray-400 mt-2 text-center max-w-lg">
+          Analyse suspicious files, folders to detect malware and other
+          breaches, protect your Linux computers.
+        </p>
+        <div className="w-full">
+          <div className="flex space-x-6 mt-6 border-b border-gray-700 w-full">
+            {["file", "folder"].map((tab) => (
+              <button
+                key={tab}
+                onClick={() => handleTabChange(tab as "file" | "folder")}
+                className={cn(
+                  "text-sm font-semibold pb-2 transition-colors w-1/2",
+                  activeTab === tab
+                    ? "text-white border-b-2 border-blue-400"
+                    : "text-gray-500"
+                )}
+              >
+                {tab.toUpperCase()}
+              </button>
+            ))}
+          </div>
+          <div className="flex flex-col items-center mt-8">
+            <FileScannerIcon />
+            {/* File Selection */}
+            {activeTab === "file" ? (
+              <>
+                <input
+                  id="file-input"
+                  type="file"
+                  className="hidden"
+                  onChange={handleFileChange}
+                />
+                <Button
+                  onClick={() => document.getElementById("file-input")?.click()}
+                  className="mt-4 bg-blue-500 hover:bg-blue-600 text-white"
+                >
+                  Choose file
+                </Button>
+              </>
+            ) : (
+              <>
+                <input
+                  ref={folderInputRef}
+                  type="file"
+                  className="hidden"
+                  multiple
+                  onChange={handleFileChange}
+                  {...{ webkitdirectory: "true", directory: "true" }} // TypeScript fix
+                />
+                <Button
+                  onClick={() => folderInputRef.current?.click()}
+                  className="mt-4 bg-blue-500 hover:bg-blue-600 text-white"
+                >
+                  Choose folder
+                </Button>
+              </>
+            )}
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+            {/* Display Folder Structure */}
+            <div className="mt-4 text-sm text-gray-400 w-full max-w-md">
+              {Object.keys(fileStructure).length > 0 ? (
+                <ul className="text-left">
+                  {Object.keys(fileStructure).map((path, index) => (
+                    <li key={index} className="truncate">
+                      {path}
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p></p>
+              )}
+            </div>
+          </div>
+
+          <div className="flex flex-row justify-center gap-4">
+            <Button
+              className={`mt-4 text-white ${
+                Object.keys(fileStructure).length === 0
+                  ? "bg-gray-500 cursor-not-allowed"
+                  : "bg-green-500 hover:bg-green-600"
+              }`}
+              disabled={Object.keys(fileStructure).length === 0}
+              onClick={() => alert("Perform quick scan")}
+            >
+              Quick scan
+            </Button>
+            <Button
+              className={`mt-4 text-white ${
+                Object.keys(fileStructure).length === 0
+                  ? "bg-gray-500 cursor-not-allowed"
+                  : "bg-green-500 hover:bg-green-600"
+              }`}
+              disabled={Object.keys(fileStructure).length === 0}
+              onClick={() => alert("Perform deep scan")}
+            >
+              Deep scan
+            </Button>
+          </div>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+      </div>
     </div>
   );
 }
