@@ -1,15 +1,19 @@
 "use client";
 import { Button } from "@/components/ui/button"; // If using shadcn/ui
-import { FileScannerIcon } from "@/components/vectors/file-scanner";
+import { FileScannerIcon } from "@/components/vectors/fileScanner";
 import { cn } from "@/lib/utils"; // Ensure you have this helper function
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Oswald } from "next/font/google";
+import useFileUpload from "@/components/hooks/useFileUpload";
+import { useRouter } from "next/navigation";
 
 const oswald = Oswald();
 
 export default function MalwareScanUI() {
   const [activeTab, setActiveTab] = useState<"file" | "folder">("file");
   const [fileStructure, setFileStructure] = useState<Record<string, File>>({});
+  const { handleUpload, uploading, sessionId, error } = useFileUpload();
+  const router = useRouter();
 
   const folderInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -38,6 +42,30 @@ export default function MalwareScanUI() {
     setActiveTab(tab);
     setFileStructure({});
   };
+
+  // Extracts File objects from fileStructure
+  const getFileList = (): FileList | null => {
+    const files = Object.values(fileStructure);
+    if (files.length === 0) return null;
+
+    const dataTransfer = new DataTransfer();
+    files.forEach((file) => dataTransfer.items.add(file));
+
+    return dataTransfer.files;
+  };
+
+  const handleCreateScanningSession = async () => {
+    const fileList = getFileList();
+    if (fileList) {
+      await handleUpload(fileList, activeTab === "folder");
+    }
+  };
+
+  useEffect(() => {
+    if (sessionId) {
+      router.push(`/scans/${sessionId}`);
+    }
+  }, [sessionId]);
 
   return (
     <div className="flex flex-col items-center bg-gray-900 text-white min-h-screen p-8">
@@ -128,12 +156,12 @@ export default function MalwareScanUI() {
                   ? "bg-gray-500 cursor-not-allowed"
                   : "bg-green-500 hover:bg-green-600"
               }`}
-              disabled={Object.keys(fileStructure).length === 0}
-              onClick={() => alert("Perform quick scan")}
+              disabled={Object.keys(fileStructure).length === 0 || uploading}
+              onClick={handleCreateScanningSession}
             >
               Quick scan
             </Button>
-            <Button
+            {/* <Button
               className={`mt-4 text-white ${
                 Object.keys(fileStructure).length === 0
                   ? "bg-gray-500 cursor-not-allowed"
@@ -143,7 +171,7 @@ export default function MalwareScanUI() {
               onClick={() => alert("Perform deep scan")}
             >
               Deep scan
-            </Button>
+            </Button> */}
           </div>
         </div>
       </div>
