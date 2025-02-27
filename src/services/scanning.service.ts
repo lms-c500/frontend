@@ -25,7 +25,10 @@ export const uploadFile = async (file: File): Promise<string> => {
 
 export const uploadFolder = async (files: FileList): Promise<string> => {
   const formData = new FormData();
-  Array.from(files).forEach((file) => formData.append("folder", file));
+  Array.from(files).forEach((file) => {
+    formData.append("folder", file);
+    formData.append("relativePaths", file.webkitRelativePath);
+  });
 
   const response = await axios.post<UploadResponse>(
     `${BASE_URL}/uploads/folders`,

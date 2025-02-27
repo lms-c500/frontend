@@ -1,11 +1,11 @@
 "use client";
+import useFileUpload from "@/components/hooks/useFileUpload";
 import { Button } from "@/components/ui/button"; // If using shadcn/ui
 import { FileScannerIcon } from "@/components/vectors/fileScanner";
 import { cn } from "@/lib/utils"; // Ensure you have this helper function
-import { useEffect, useRef, useState } from "react";
 import { Oswald } from "next/font/google";
-import useFileUpload from "@/components/hooks/useFileUpload";
 import { useRouter } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
 
 const oswald = Oswald();
 

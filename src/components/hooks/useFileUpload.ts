@@ -1,6 +1,6 @@
-import { useState } from "react";
 import { uploadFile, uploadFolder } from "@/services/scanning.service";
-import useScanSession from "./useScanSessions";
+import { AxiosError } from "axios";
+import { useEffect, useState } from "react";
 
 export interface UploadState {
   handleUpload: (files: FileList | null, isFolder?: boolean) => Promise<void>;
@@ -20,6 +20,12 @@ const useFileUpload = (): UploadState => {
   ) => {
     if (!files || (isFolder && files.length === 0)) return;
 
+    const size = Array.from(files).reduce((acc, file) => acc + file.size, 0);
+    const sizeLimit = parseInt(process.env.NEXT_UPLOAD_SIZE_LIMIT_MB ?? "10");
+    if (size > sizeLimit * 1024 * 1024) {
+      setError(`Total upload size must not exceed ${sizeLimit}MB.`);
+      return;
+    }
     setUploading(true);
     setError(null);
 
@@ -29,11 +35,19 @@ const useFileUpload = (): UploadState => {
         : await uploadFile(files[0]);
       setSessionId(session);
     } catch (err) {
-      setError("Upload failed. Please try again.");
+      const e = err as AxiosError;
+      setError(`Upload failed. Reason: ${(e.response?.data as any)?.error}`);
     } finally {
       setUploading(false);
     }
   };
+
+  useEffect(() => {
+    if (error) {
+      alert(error);
+      setError(null);
+    }
+  });
 
   return { handleUpload, uploading, sessionId, error };
 };
