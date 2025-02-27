@@ -15,7 +15,7 @@ export function SingleFileResult({
       </small>
       <br />
       <div
-        key={file.filePath}
+        key={file.relativePath}
         className="grid grid-cols-4 gap-4 mb-4 p-4 border rounded-lg"
       >
         <div className="col-span-1 font-semibold">File Name:</div>

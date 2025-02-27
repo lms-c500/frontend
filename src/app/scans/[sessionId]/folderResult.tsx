@@ -57,16 +57,16 @@ export function FolderResult({ session }: { session: Session }) {
                     <td className="border px-4 py-2">{index + 1}</td>
                     <td className="border px-4 py-2">{file.fileName}</td>
                     <td className="border px-4 py-2">{file.malwareType}</td>
-                    <td className="border px-4 py-2">{file.confidence}%</td>
+                    <td className="border px-4 py-2">{file.confidence} (%)</td>
                   </tr>
                 ))}
             </tbody>
           </table>
         </>
       ) : (
-        <h2 className="text-xl font-bold mb-4">NO MALWARE FOUND</h2>
+        <h2 className="text-xl font-bold">NO MALWARE FOUND</h2>
       )}
-      <div className="w-full">
+      <div className="w-full flex flex-col items-center mb-4">
         <Dialog>
           <DialogTrigger className="mt-4 px-4 py-2 text-sm rounded-sm text-white bg-blue-500 hover:bg-blue-600 transition duration-150 ease-in-out">
             More details
@@ -82,7 +82,6 @@ export function FolderResult({ session }: { session: Session }) {
                 <thead>
                   <tr>
                     <th className="border px-4 py-2">#</th>
-                    <th className="border px-4 py-2">File Name</th>
                     <th className="border px-4 py-2">File Path</th>
                     <th className="border px-4 py-2">File Size</th>
                     <th className="border px-4 py-2">MD5</th>
@@ -90,15 +89,14 @@ export function FolderResult({ session }: { session: Session }) {
                     <th className="border px-4 py-2">Status</th>
                     <th className="border px-4 py-2">Malware Status</th>
                     <th className="border px-4 py-2">Malware Type</th>
-                    <th className="border px-4 py-2">Confidence %</th>
+                    <th className="border px-4 py-2">Confidence (%)</th>
                   </tr>
                 </thead>
                 <tbody>
                   {session.files.map((file, index) => (
                     <tr key={index}>
                       <td className="border px-4 py-2">{index + 1}</td>
-                      <td className="border px-4 py-2">{file.fileName}</td>
-                      <td className="border px-4 py-2">{file.filePath}</td>
+                      <td className="border px-4 py-2">{file.relativePath}</td>
                       <td className="border px-4 py-2">
                         {file.fileSize.toLocaleString()} bytes
                       </td>

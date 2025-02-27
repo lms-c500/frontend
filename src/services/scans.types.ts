@@ -1,6 +1,6 @@
 export type FileResult = {
   fileName: string;
-  filePath: string;
+  relativePath: string;
   fileSize: number;
   md5: string | null;
   sha256: string | null;
