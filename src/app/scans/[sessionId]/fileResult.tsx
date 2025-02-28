@@ -26,14 +26,16 @@ export function SingleFileResult({
         <div className="col-span-3">{file.md5}</div>
         <div className="col-span-1 font-semibold">SHA256:</div>
         <div className="col-span-3">{file.sha256}</div>
-        <div className="col-span-1 font-semibold">Scanning Result:</div>
+        <div className="col-span-1 font-semibold">ELF Status:</div>
         <div className="col-span-3">
-          {file.isMalware
-            ? `Is Malware (${file.malwareType})`
-            : "No malware found"}
+          {file.isELF
+            ? `ELF File (${file.architecture || "Unknown architecture"})`
+            : "Non-ELF"}
         </div>
-        <div className="col-span-1 font-semibold">Confidence:</div>
-        <div className="col-span-3">{file.confidence}%</div>
+        <div className="col-span-1 font-semibold">Scanning Result:</div>
+        <div className="col-span-3">{file.malwareStatus}</div>
+        <div className="col-span-1 font-semibold">Details:</div>
+        <div className="col-span-3">{file.scanDetails || "N/A"}</div>
       </div>
     </div>
   );

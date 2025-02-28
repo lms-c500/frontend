@@ -3,7 +3,11 @@ import { AxiosError } from "axios";
 import { useEffect, useState } from "react";
 
 export interface UploadState {
-  handleUpload: (files: FileList | null, isFolder?: boolean) => Promise<void>;
+  handleUpload: (
+    files: FileList | null,
+    isFolder?: boolean,
+    scanType?: string
+  ) => Promise<void>;
   uploading: boolean;
   sessionId?: string;
   error: string | null;
@@ -16,12 +20,13 @@ const useFileUpload = (): UploadState => {
 
   const handleUpload = async (
     files: FileList | null,
-    isFolder: boolean = false
+    isFolder: boolean = false,
+    scanType: string = "quick"
   ) => {
     if (!files || (isFolder && files.length === 0)) return;
 
     const size = Array.from(files).reduce((acc, file) => acc + file.size, 0);
-    const sizeLimit = parseInt(process.env.NEXT_UPLOAD_SIZE_LIMIT_MB ?? "10");
+    const sizeLimit = parseInt(process.env.NEXT_UPLOAD_SIZE_LIMIT_MB ?? "600");
     if (size > sizeLimit * 1024 * 1024) {
       setError(`Total upload size must not exceed ${sizeLimit}MB.`);
       return;
@@ -31,8 +36,8 @@ const useFileUpload = (): UploadState => {
 
     try {
       const session = isFolder
-        ? await uploadFolder(files)
-        : await uploadFile(files[0]);
+        ? await uploadFolder(files, scanType)
+        : await uploadFile(files[0], scanType);
       setSessionId(session);
     } catch (err) {
       const e = err as AxiosError;

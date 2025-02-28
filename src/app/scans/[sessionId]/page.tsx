@@ -8,8 +8,8 @@ import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { SingleFileResult } from "./fileResult";
 import { FolderResult } from "./folderResult";
+import { InProgress } from "./inProgress";
 import { SessionNotFound } from "./notFound";
-import ElapsedTimeCounter from "@/components/ui/timeCounter";
 
 export default function SessionDetailsPage() {
   const { sessionId } = useParams();
@@ -36,15 +36,7 @@ export default function SessionDetailsPage() {
   }
 
   if (["pending", "in_progress"].includes(sessionState.status)) {
-    return (
-      <div>
-        <p>Scanning in progress:</p>
-        <p>
-          Elapsed Time:{" "}
-          <ElapsedTimeCounter startTime={sessionState.createdAt} />
-        </p>
-      </div>
-    );
+    return <InProgress sessionState={sessionState} />;
   }
   return (
     <div className="w-full min-h-screen px-4 py-4 flex flex-col items-center bg-gray-900 text-white">

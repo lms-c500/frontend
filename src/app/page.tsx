@@ -54,10 +54,10 @@ export default function MalwareScanUI() {
     return dataTransfer.files;
   };
 
-  const handleCreateScanningSession = async () => {
+  const handleCreateScanningSession = (scanType: string) => async () => {
     const fileList = getFileList();
     if (fileList) {
-      await handleUpload(fileList, activeTab === "folder");
+      await handleUpload(fileList, activeTab === "folder", scanType);
     }
   };
 
@@ -157,21 +157,21 @@ export default function MalwareScanUI() {
                   : "bg-green-500 hover:bg-green-600"
               }`}
               disabled={Object.keys(fileStructure).length === 0 || uploading}
-              onClick={handleCreateScanningSession}
+              onClick={handleCreateScanningSession("quick")}
             >
               Quick scan
             </Button>
-            {/* <Button
+            <Button
               className={`mt-4 text-white ${
                 Object.keys(fileStructure).length === 0
                   ? "bg-gray-500 cursor-not-allowed"
                   : "bg-green-500 hover:bg-green-600"
               }`}
-              disabled={Object.keys(fileStructure).length === 0}
-              onClick={() => alert("Perform deep scan")}
+              disabled={Object.keys(fileStructure).length === 0 || uploading}
+              onClick={handleCreateScanningSession("deep")}
             >
               Deep scan
-            </Button> */}
+            </Button>
           </div>
         </div>
       </div>

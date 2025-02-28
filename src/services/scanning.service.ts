@@ -8,9 +8,13 @@ export interface UploadResponse {
   sessionId: string;
 }
 
-export const uploadFile = async (file: File): Promise<string> => {
+export const uploadFile = async (
+  file: File,
+  scanType: string
+): Promise<string> => {
   const formData = new FormData();
   formData.append("file", file);
+  formData.append("scanType", scanType);
 
   const response = await axios.post<UploadResponse>(
     `${BASE_URL}/uploads/files`,
@@ -23,12 +27,16 @@ export const uploadFile = async (file: File): Promise<string> => {
   return response.data.sessionId;
 };
 
-export const uploadFolder = async (files: FileList): Promise<string> => {
+export const uploadFolder = async (
+  files: FileList,
+  scanType: string
+): Promise<string> => {
   const formData = new FormData();
   Array.from(files).forEach((file) => {
     formData.append("folder", file);
     formData.append("relativePaths", file.webkitRelativePath);
   });
+  formData.append("scanType", scanType);
 
   const response = await axios.post<UploadResponse>(
     `${BASE_URL}/uploads/folders`,

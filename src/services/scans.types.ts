@@ -10,9 +10,10 @@ export type FileResult = {
     | "scanning"
     | "completed"
     | "failed";
-  isMalware: boolean | null;
-  malwareType: string | null;
-  confidence: number | null; // Confidence score (0-100)
+  malwareStatus: string | null;
+  scanDetails: string | null;
+  isELF: boolean;
+  architecture: string | null;
 };
 
 export type Session = {
