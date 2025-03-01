@@ -9,7 +9,7 @@ const pFont = makePFont({ weight: "400" });
 
 export function InProgress({ sessionState }: { sessionState?: Session }) {
   return (
-    <div className="w-full h-screen flex flex-col items-center justify-center bg-gray-900">
+    <div className="w-full h-screen flex flex-col items-center justify-center bg-gray-900 text-white">
       <h2 className={`text-3xl ${headingFont.className}`}>
         Scanning in progress
       </h2>
